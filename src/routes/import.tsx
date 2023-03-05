@@ -1,3 +1,3 @@
 export default () => {
-  return <main>Import data!</main>;
+  return <main class="flex justify-center py-24 text-4xl font-bold">TODO</main>;
 };

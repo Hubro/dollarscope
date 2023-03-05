@@ -3,6 +3,6 @@ module.exports = {
     "prettier-plugin-tailwindcss",
     "@trivago/prettier-plugin-sort-imports",
   ],
-  importOrder: ["^\\.\\./(.*)$", "^\\./(.*)$"],
+  importOrder: ["^~/(.*)$", "^\\.\\./(.*)$", "^\\./(.*)$"],
   importOrderSeparation: true,
 };
