@@ -1,0 +1,16 @@
+
+# Local data for testing
+/data/
+
+# Local environment variables
+/.envrc
+/.env
+
+# Auto-generated stuff
+/node_modules
+/dist/
+/.solid/
+
+# Trash
+.DS_Store
+Thumbs.db
