@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { ColDef } from "ag-grid-community";
-import { createEffect, lazy, Show, Suspense } from "solid-js";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
+import { lazy, Show, Suspense } from "solid-js";
 import { useRouteData } from "solid-start";
 import { createServerData$ } from "solid-start/server";
 
+import "~/ag-grid-customization.css";
 import LoadingSpinner from "~/components/LoadingSpinner";
-
-import("ag-grid-community/styles/ag-grid.css");
-import("ag-grid-community/styles/ag-theme-alpine.css");
 
 const AgGridSolid = lazy(() => {
   return import("ag-grid-solid");

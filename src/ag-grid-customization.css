@@ -1,0 +1,13 @@
+.ag-theme-alpine-dark {
+    --ag-borders: 0px solid;
+    --ag-header-background-color: theme("colors.gray.900");
+    --ag-background-color: theme("colors.gray.800");
+    --ag-odd-row-background-color: theme("colors.gray.700 / 30%");
+    --ag-row-border-color: theme("colors.gray.700");
+    --ag-row-hover-color: theme("colors.gray.700 / 80%");
+    --ag-alpine-active-color: theme("colors.gray.400");
+}
+
+.ag-theme-alpine-dark .ag-header-row {
+    border-top: 3px solid theme("colors.gray.800");
+}
