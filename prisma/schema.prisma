@@ -16,6 +16,7 @@ model Account {
 }
 
 model Line {
+  id            Int       @id @default(autoincrement())
   date          String
   description   String
   value         Float
@@ -24,5 +25,5 @@ model Line {
   account       Account   @relation(fields: [accountId], references: [id])
   accountId     Int
 
-  @@id([date, description, value])
+  @@unique([date, description, value])
 }
