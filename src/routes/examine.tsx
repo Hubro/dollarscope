@@ -2,7 +2,14 @@ import { Line, PrismaClient } from "@prisma/client";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import { Show, Suspense } from "solid-js";
+import { AgGridSolidRef } from "ag-grid-solid";
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  Show,
+  Suspense,
+} from "solid-js";
 import { unstable_clientOnly, useRouteData } from "solid-start";
 import {
   createServerData$,
@@ -33,7 +40,9 @@ export function routeData() {
 }
 
 export default () => {
-  const lines = useRouteData<typeof routeData>();
+  let [gridRef, setGridRef] = createSignal<AgGridSolidRef>();
+
+  const rawLines = useRouteData<typeof routeData>();
 
   const [toggleIgnoreLineStatus, toggleIgnoreLine] = createServerMultiAction$(
     async (args: { lineId: number; ignore: boolean }) => {
@@ -50,6 +59,39 @@ export default () => {
       invalidate: [],
     }
   );
+
+  // The lines, but with optimistic updates applied
+  const lines = createMemo<Line[] | undefined>(() => {
+    const lines = rawLines();
+
+    if (!lines) return;
+
+    const updates: { [lineId: string]: boolean } = {};
+
+    for (const status of toggleIgnoreLineStatus) {
+      if (status.result) {
+        updates[status.result.id] = status.result.ignore;
+      } else if (status.error) {
+        // Do nothing, the previously optimistic update will be cleared
+      } else {
+        // Optimistically assume the update succeeded
+        updates[status.input.lineId] = status.input.ignore;
+      }
+    }
+
+    return lines.map((line) =>
+      line.id in updates ? { ...line, ignore: updates[line.id] } : line
+    );
+  });
+
+  // Redraws AG Grid rows whenever the lines are updated
+  createEffect(() => {
+    const ref = gridRef();
+
+    if (lines() && ref && ref.api) {
+      ref.api.redrawRows();
+    }
+  });
 
   const CheckboxRenderer = (props: ICellRendererParams<Line, boolean>) => {
     const toggleCheck = (checked: boolean) => {
@@ -115,20 +157,26 @@ export default () => {
       <Suspense fallback={BigSpinner}>
         <Show when={lines()}>
           <AgGridSolid
+            ref={setGridRef}
             fallback={BigSpinner}
             rowData={lines()}
             columnDefs={columnDefs}
             defaultColDef={defaultColumnDefs}
+            getRowClass={(params) => {
+              if (params.data?.ignore) {
+                return "ignored";
+              }
+            }}
+            getRowId={(params) => {
+              return params.data.id.toString();
+            }}
             onGridReady={(e) => {
               e.api.sizeColumnsToFit();
-            }}
-            onCellValueChanged={(e) => {
-              console.log("Cell value has changed!", e);
             }}
             onCellKeyPress={(e) => {
               if (
                 e.event &&
-                e.column.colId == "ignore" &&
+                (e as any).column?.colId == "ignore" &&
                 (e.event as KeyboardEvent).code == "Space"
               ) {
                 const eventContainer = e.eventPath![0];

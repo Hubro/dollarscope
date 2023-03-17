@@ -12,6 +12,16 @@
     border-top: 3px solid theme("colors.gray.800");
 }
 
+.ag-row.ignored {
+    --ag-odd-row-background-color: theme("colors.gray.700");
+    --ag-row-background-color: theme("colors.gray.700");
+    --ag-background-color: theme("colors.gray.700");
+    --ag-row-hover-color: theme("colors.gray.600 / 80%");
+    color: theme("colors.gray.300");
+    opacity: 0.7;
+    border-bottom-color: theme("colors.gray.600");
+}
+
 .ag-cell-value {
     display: flex;
     align-items: center;
