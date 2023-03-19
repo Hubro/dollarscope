@@ -42,6 +42,10 @@ export function routeData() {
 export default () => {
   let [gridRef, setGridRef] = createSignal<AgGridSolidRef>();
 
+  // This is used to hide the grid with opacity-0 until it's idle.
+  // This avoids some very ugly flickering on first render.
+  let [showGrid, setShowGrid] = createSignal<boolean>();
+
   const rawLines = useRouteData<typeof routeData>();
 
   const [toggleIgnoreLineStatus, toggleIgnoreLine] = createServerMultiAction$(
@@ -153,7 +157,10 @@ export default () => {
   };
 
   return (
-    <div class="absolute inset-0 leading-4 ag-theme-alpine-dark">
+    <div
+      class="absolute inset-0 leading-4 ag-theme-alpine-dark transition-opacity transition duration-100"
+      classList={{ "opacity-0": !showGrid() }}
+    >
       <Suspense fallback={BigSpinner}>
         <Show when={lines()}>
           <AgGridSolid
@@ -172,6 +179,7 @@ export default () => {
             }}
             onGridReady={(e) => {
               e.api.sizeColumnsToFit();
+              setShowGrid(true);
             }}
             onCellKeyPress={(e) => {
               if (
